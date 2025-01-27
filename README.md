@@ -1,16 +1,15 @@
 **Snake Game by AI 🚀**
-\n
-Welcome to __Snake Game by AI! 🎮__ A classic Snake game reimagined with cutting-edge AI, built using __Jetpack Compose__ and powered by __Windsurf AI__ for a truly autonomous gameplay experience. Watch as the snake learns and plays all on its own!
+    Welcome to __Snake Game by AI! 🎮__ A classic Snake game reimagined with cutting-edge AI, built using __Jetpack Compose__ and powered by __Windsurf AI__ for a truly autonomous gameplay experience. Watch as the snake learns and plays all on its own!
 
-**Features**
+**Features**    
 __🚀 Autonomous Gameplay__: Let the AI control the snake and make intelligent decisions.
 __🖥️ Beautiful UI__: Built with __Jetpack Compose__ for a modern, fluid user interface on Android.
 __🤖 AI Integration__: Powered by Windsurf AI, the snake evolves and improves its strategy.
 __🎮 Manual Mode__: Switch to manual mode and take control of the snake yourself!
-**How It Works**
+**How It Works**    
 The game leverages __Windsurf AI__ to autonomously navigate the snake, deciding where to move, when to turn, and how to collect food while avoiding collisions. The snake continuously learns from its environment and adapts its strategy.
 
-**Technologies Used**
+**Technologies Used**    
 __Jetpack Compose__: Modern UI toolkit for building native Android apps.
 __Windsurf AI__: AI system driving the autonomous gameplay.
 __Kotlin__: The language that powers this app, leveraging its conciseness and safety.
