@@ -1,4 +1,5 @@
 **Snake Game by AI 🚀**
+\n
 Welcome to __Snake Game by AI! 🎮__ A classic Snake game reimagined with cutting-edge AI, built using __Jetpack Compose__ and powered by __Windsurf AI__ for a truly autonomous gameplay experience. Watch as the snake learns and plays all on its own!
 
 **Features**
