@@ -1,45 +1,46 @@
-Snake Game by AI
-Welcome to the Snake Game by AI repository! 🎮🐍 This project is an implementation of the classic Snake Game, built using Jetpack Compose and powered by Windsurf AI for intelligent gameplay.
+Snake Game by AI 🚀
+Welcome to Snake Game by AI! 🎮 A classic Snake game reimagined with cutting-edge AI, built using Jetpack Compose and powered by Windsurf AI for a truly autonomous gameplay experience. Watch as the snake learns and plays all on its own!
 
 Features
-Classic Snake Gameplay: Relive the fun of the classic Snake game.
-AI Integration: Watch the AI play the game autonomously using Windsurf AI.
-Smooth UI: Powered by Jetpack Compose for a clean and responsive user interface.
+🚀 Autonomous Gameplay: Let the AI control the snake and make intelligent decisions.
+🖥️ Beautiful UI: Built with Jetpack Compose for a modern, fluid user interface on Android.
+🤖 AI Integration: Powered by Windsurf AI, the snake evolves and improves its strategy.
+🎮 Manual Mode: Switch to manual mode and take control of the snake yourself!
 How It Works
-The AI uses Windsurf AI to autonomously control the snake, making intelligent decisions about its movement. The snake aims to consume food and avoid collisions, learning from its environment.
+The game leverages Windsurf AI to autonomously navigate the snake, deciding where to move, when to turn, and how to collect food while avoiding collisions. The snake continuously learns from its environment and adapts its strategy.
 
 Technologies Used
-Jetpack Compose: For building the user interface in Android.
-Windsurf AI: For providing the AI capabilities to navigate and play the game.
-Kotlin: The main programming language for the app.
-Setup Instructions
-To get started with the project:
+Jetpack Compose: Modern UI toolkit for building native Android apps.
+Windsurf AI: AI system driving the autonomous gameplay.
+Kotlin: The language that powers this app, leveraging its conciseness and safety.
+Installation & Setup
+To get started and run the game locally, follow these steps:
 
-Clone the Repository:
-
+1. Clone the Repository
 bash
 Copy
 Edit
 git clone https://github.com/Abhi95081/Snake_Game_By_AI.git
 cd Snake_Game_By_AI
-Open the Project: Open the project in Android Studio (make sure you have the latest version of Android Studio installed).
+2. Open the Project
+Open the project in Android Studio.
 
-Run the App:
+3. Build & Run
+Click Run in Android Studio to build and deploy the app on your Android device or emulator.
 
-Click on the Run button in Android Studio to launch the app on an emulator or connected device.
-Gameplay Instructions
-The game automatically plays using AI (powered by Windsurf AI) by default.
-If you'd like to take control, manual gameplay can also be enabled via settings.
+Gameplay
+AI Mode: By default, the snake is controlled by the AI, powered by Windsurf AI.
+Manual Mode: You can take over and manually control the snake using the arrow keys (or on-screen controls).
 Contributing
-Contributions are welcome! Feel free to:
+We welcome contributions to make this project even better! Feel free to:
 
-Suggest improvements.
-Report issues.
+Suggest new features.
+Report bugs or issues.
 Submit pull requests.
-Please follow the repository's code style and include descriptive commit messages.
+Be sure to follow the code style and include detailed commit messages when contributing.
 
 License
 This project is licensed under the MIT License.
 
 Contact
-Created by Abhishek Roushan.
+Created by Abhishek Roushan. If you have any questions or feedback, feel free to reach out!
