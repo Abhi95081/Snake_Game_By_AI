@@ -75,12 +75,15 @@ class SnakeGameState(
         }
 
         // Precise food collision check
-        val isFoodEaten = newHead.position.x.toInt() == food.position.x.toInt() && 
-                          newHead.position.y.toInt() == food.position.y.toInt()
+        // Check if any part of the snake touches the food
+        val isFoodEaten = snake.any { 
+            it.position.x.toInt() == food.position.x.toInt() && 
+            it.position.y.toInt() == food.position.y.toInt() 
+        }
 
         // Check food collision
         val newSnake = if (isFoodEaten) {
-            Log.d("SnakeGameState", " Food Eaten! Current snake length: ${snake.size}")
+            Log.d("SnakeGameState", "Food Eaten! Current snake length: ${snake.size}")
             score++
             food = generateFood()
             listOf(newHead) + snake  // Grow the snake
@@ -127,32 +130,6 @@ class SnakeGameState(
     }
 
     private fun generateFood(): SnakeSegment {
-        var newFood: Offset
-        var attempts = 0
-        val maxAttempts = gridWidth * gridHeight * 3  // Increased attempts
-
-        do {
-            newFood = Offset(
-                Random.nextInt(0, gridWidth).toFloat(),
-                Random.nextInt(0, gridHeight).toFloat()
-            )
-            attempts++
-
-            // Prevent infinite loop
-            if (attempts > maxAttempts) {
-                Log.e("SnakeGameState", "Could not generate food after $maxAttempts attempts")
-                return generateFallbackFood()
-            }
-        } while (snake.any { 
-            it.position.x.toInt() == newFood.x.toInt() && 
-            it.position.y.toInt() == newFood.y.toInt() 
-        })
-
-        Log.d("SnakeGameState", " New Food Generated at (${newFood.x}, ${newFood.y}) after $attempts attempts")
-        return SnakeSegment(newFood)
-    }
-
-    private fun generateFallbackFood(): SnakeSegment {
         // Find all empty grid positions
         val emptyPositions = (0 until gridWidth).flatMap { x ->
             (0 until gridHeight).map { y ->
@@ -166,14 +143,14 @@ class SnakeGameState(
         }
 
         return if (emptyPositions.isNotEmpty()) {
-            val fallbackFood = SnakeSegment(emptyPositions.random())
-            Log.d("SnakeGameState", " Fallback Food Generated at (${fallbackFood.position.x}, ${fallbackFood.position.y})")
-            fallbackFood
+            val newFood = SnakeSegment(emptyPositions.random())
+            Log.d("SnakeGameState", "New Food Generated at (${newFood.position.x}, ${newFood.position.y})")
+            newFood
         } else {
-            // Absolute last resort - place food at snake's tail
-            val lastResortFood = SnakeSegment(snake.last().position)
-            Log.d("SnakeGameState", " Last Resort Food Generated at (${lastResortFood.position.x}, ${lastResortFood.position.y})")
-            lastResortFood
+            // Game is essentially won - all grid positions are filled
+            Log.d("SnakeGameState", "Game completed - all grid positions filled")
+            gameOver()
+            SnakeSegment(Offset(-1f, -1f))  // Invalid food position
         }
     }
 }

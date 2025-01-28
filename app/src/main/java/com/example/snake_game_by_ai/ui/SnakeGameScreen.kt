@@ -41,8 +41,8 @@ import androidx.compose.ui.unit.sp
 import com.example.snake_game_by_ai.R
 import com.example.snake_game_by_ai.game.Direction
 import com.example.snake_game_by_ai.game.SnakeGameState
-import com.example.snake_game_by_ai.ui.theme.FoodRed
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlin.math.min
 
 // Multi-color palette for snake segments
@@ -54,6 +54,16 @@ val SNAKE_COLORS = listOf(
     Color(0xFFFF9800),   // Orange
     Color(0xFF009688),   // Teal
     Color(0xFFFF5722)    // Deep Orange
+)
+
+// Rainbow color palette for border
+val RAINBOW_COLORS = listOf(
+    Color.Red,
+    Color.Yellow,
+    Color.Green,
+    Color.Blue,
+    Color.Cyan,
+    Color.Magenta
 )
 
 @Composable
@@ -214,9 +224,9 @@ fun SnakeGameScreen() {
     }
 
     // Game Loop
-    LaunchedEffect(Unit) {
+    LaunchedEffect(gameState.isGameOver) {
         while (!gameState.isGameOver) {
-            delay(200)  // Control snake speed
+            delay(200)
             gameState.moveSnake()
         }
     }
@@ -245,14 +255,21 @@ fun SnakeGameScreen() {
                     color = Color.White,
                     fontSize = 24.sp
                 )
+                Text(
+                    text = "Max Score: ${gameState.maxScore}",
+                    color = Color.White,
+                    fontSize = 20.sp
+                )
                 Button(
                     onClick = { 
                         gameState.resetGame() 
-                        soundManager.playGameOverSound()
+                        coroutineScope.launch {
+                            soundManager.playGameOverSound()
+                        }
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(alpha = 0.5f),
-                        contentColor = Color.Black
+                        containerColor = Color.White.copy(alpha = 0.3f),
+                        contentColor = Color.White
                     )
                 ) {
                     Text("Retry")
@@ -263,19 +280,77 @@ fun SnakeGameScreen() {
 }
 
 private fun DrawScope.drawGameBoard(gameState: SnakeGameState) {
-    // Draw a more prominent border
-    drawRect(
-        color = Color.White.copy(alpha = 0.5f),  // Semi-transparent white border
-        style = Stroke(width = 4f),  // Thicker border
-        topLeft = Offset.Zero,
-        size = Size(size.width, size.height)
+    // Draw single line border around the entire game board without corner blocks
+    val borderColor = Color.White.copy(alpha = 0.5f)
+    val borderStrokeWidth = 2f
+    
+    // Top border
+    drawLine(
+        color = borderColor,
+        start = Offset(0f, 0f),
+        end = Offset(size.width, 0f),
+        strokeWidth = borderStrokeWidth
+    )
+    
+    // Bottom border
+    drawLine(
+        color = borderColor,
+        start = Offset(0f, size.height),
+        end = Offset(size.width, size.height),
+        strokeWidth = borderStrokeWidth
+    )
+    
+    // Left border
+    drawLine(
+        color = borderColor,
+        start = Offset(0f, 0f),
+        end = Offset(0f, size.height),
+        strokeWidth = borderStrokeWidth
+    )
+    
+    // Right border
+    drawLine(
+        color = borderColor,
+        start = Offset(size.width, 0f),
+        end = Offset(size.width, size.height),
+        strokeWidth = borderStrokeWidth
     )
 
-    // Draw snake segments with multi-color palette
-    gameState.snake.forEachIndexed { index, segment ->
-        val cellWidth = size.width / gameState.gameGridWidth
-        val cellHeight = size.height / gameState.gameGridHeight
+    // Draw rainbow border segments
+    val borderWidth = 3  // Increased border width
+    val cellWidth = size.width / gameState.gameGridWidth
+    val cellHeight = size.height / gameState.gameGridHeight
 
+    // Top border
+    for (x in 0 until borderWidth) {
+        drawRect(
+            color = RAINBOW_COLORS[x % RAINBOW_COLORS.size].copy(alpha = 0.7f),
+            topLeft = Offset(x * cellWidth, 0f),
+            size = Size(cellWidth, cellHeight)
+        )
+        drawRect(
+            color = RAINBOW_COLORS[x % RAINBOW_COLORS.size].copy(alpha = 0.7f),
+            topLeft = Offset(x * cellWidth, (gameState.gameGridHeight - 1) * cellHeight),
+            size = Size(cellWidth, cellHeight)
+        )
+    }
+
+    // Side borders
+    for (y in 0 until borderWidth) {
+        drawRect(
+            color = RAINBOW_COLORS[y % RAINBOW_COLORS.size].copy(alpha = 0.7f),
+            topLeft = Offset(0f, y * cellHeight),
+            size = Size(cellWidth, cellHeight)
+        )
+        drawRect(
+            color = RAINBOW_COLORS[y % RAINBOW_COLORS.size].copy(alpha = 0.7f),
+            topLeft = Offset((gameState.gameGridWidth - 1) * cellWidth, y * cellHeight),
+            size = Size(cellWidth, cellHeight)
+        )
+    }
+
+    // Draw snake segments with smaller size and subtle borders
+    gameState.snake.forEachIndexed { index, segment ->
         val color = SNAKE_COLORS[index % SNAKE_COLORS.size]
         val darkerColor = color.copy(
             red = min(color.red * 1.2f, 1f),
@@ -283,45 +358,45 @@ private fun DrawScope.drawGameBoard(gameState: SnakeGameState) {
             blue = min(color.blue * 1.2f, 1f)
         )
 
-        // Draw snake segment with slight rounding
+        // Reduce segment size (create inset)
+        val inset = cellWidth * 0.1f  // 10% inset from cell edges
         drawRect(
             color = color,
             topLeft = Offset(
-                segment.position.x * cellWidth + cellWidth * 0.1f,
-                segment.position.y * cellHeight + cellHeight * 0.1f
+                segment.position.x * cellWidth + inset,
+                segment.position.y * cellHeight + inset
             ),
             size = Size(
-                cellWidth * 0.8f, 
-                cellHeight * 0.8f
+                cellWidth - (2 * inset), 
+                cellHeight - (2 * inset)
             )
         )
         
-        // Add subtle border for depth
+        // Add very subtle border
         drawRect(
             color = darkerColor.copy(alpha = 0.3f),
-            style = Stroke(width = 2f),
+            style = Stroke(width = 1f),
             topLeft = Offset(
-                segment.position.x * cellWidth + cellWidth * 0.1f,
-                segment.position.y * cellHeight + cellHeight * 0.1f
+                segment.position.x * cellWidth + inset,
+                segment.position.y * cellHeight + inset
             ),
             size = Size(
-                cellWidth * 0.8f, 
-                cellHeight * 0.8f
+                cellWidth - (2 * inset), 
+                cellHeight - (2 * inset)
             )
         )
     }
 
-    // Draw food with smaller size and more vibrant color
-    val cellWidth = size.width / gameState.gameGridWidth
-    val cellHeight = size.height / gameState.gameGridHeight
-    val foodSize = Size(cellWidth * 0.6f, cellHeight * 0.6f)  // Smaller food size
+    // Draw food with smaller circular shape
+    val foodSize = cellWidth * 0.6f  // Reduce food size to 60% of cell width
+    val foodCenter = Offset(
+        gameState.food.position.x * cellWidth + cellWidth / 2f,
+        gameState.food.position.y * cellHeight + cellHeight / 2f
+    )
     
-    drawRect(
-        color = FoodRed.copy(alpha = 0.8f),  // More vibrant food color
-        topLeft = Offset(
-            gameState.food.position.x * cellWidth + cellWidth * 0.2f,
-            gameState.food.position.y * cellHeight + cellHeight * 0.2f
-        ),
-        size = foodSize
+    drawCircle(
+        color = Color.Red,  // Simple red color
+        radius = foodSize / 2f,
+        center = foodCenter
     )
 }
