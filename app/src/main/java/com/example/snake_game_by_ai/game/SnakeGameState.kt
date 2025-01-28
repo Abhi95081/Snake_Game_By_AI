@@ -20,6 +20,9 @@ class SnakeGameState(
     private val gridWidth: Int = 15,
     private val gridHeight: Int = 25
 ) {
+    val gameGridWidth: Int get() = gridWidth
+    val gameGridHeight: Int get() = gridHeight
+
     private val prefs: SharedPreferences = context.getSharedPreferences("SnakeGamePrefs", Context.MODE_PRIVATE)
 
     var snake by mutableStateOf(listOf(SnakeSegment(Offset(gridWidth / 2f, gridHeight / 2f))))

@@ -31,10 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -43,9 +42,8 @@ import com.example.snake_game_by_ai.R
 import com.example.snake_game_by_ai.game.Direction
 import com.example.snake_game_by_ai.game.SnakeGameState
 import com.example.snake_game_by_ai.ui.theme.FoodRed
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlin.math.min
 
 // Multi-color palette for snake segments
 val SNAKE_COLORS = listOf(
@@ -60,7 +58,7 @@ val SNAKE_COLORS = listOf(
 
 @Composable
 fun DirectionButton(
-    icon: ImageVector,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     contentDescription: String,
     onClick: () -> Unit
 ) {
@@ -169,31 +167,7 @@ fun SnakeGameScreen() {
                 .padding(8.dp)
         ) {
             Canvas(modifier = Modifier.fillMaxSize()) {
-                val cellSize = size.width / 15f
-
-                // Draw Snake with multi-color segments
-                gameState.snake.forEachIndexed { index, segment ->
-                    val segmentColor = SNAKE_COLORS[index % SNAKE_COLORS.size]
-                    
-                    drawRect(
-                        color = segmentColor,
-                        topLeft = Offset(
-                            segment.position.x * cellSize,
-                            segment.position.y * cellSize
-                        ),
-                        size = Size(cellSize, cellSize)
-                    )
-                }
-
-                // Draw Food
-                drawRect(
-                    color = FoodRed,
-                    topLeft = Offset(
-                        gameState.food.position.x * cellSize,
-                        gameState.food.position.y * cellSize
-                    ),
-                    size = Size(cellSize, cellSize)
-                )
+                drawGameBoard(gameState)
             }
         }
 
@@ -240,16 +214,16 @@ fun SnakeGameScreen() {
     }
 
     // Game Loop
-    LaunchedEffect(gameState.isGameOver) {
+    LaunchedEffect(Unit) {
         while (!gameState.isGameOver) {
-            delay(200)
+            delay(200)  // Control snake speed
             gameState.moveSnake()
         }
     }
 
     // Game Over Handling
     if (gameState.isGameOver) {
-        coroutineScope.launch(Dispatchers.Default) {
+        LaunchedEffect(Unit) {
             soundManager.playGameOverSound()
         }
         
@@ -271,21 +245,14 @@ fun SnakeGameScreen() {
                     color = Color.White,
                     fontSize = 24.sp
                 )
-                Text(
-                    text = "Max Score: ${gameState.maxScore}",
-                    color = Color.White,
-                    fontSize = 20.sp
-                )
                 Button(
                     onClick = { 
                         gameState.resetGame() 
-                        coroutineScope.launch(Dispatchers.Default) {
-                            soundManager.playGameOverSound()
-                        }
+                        soundManager.playGameOverSound()
                     },
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color.White.copy(alpha = 0.3f),
-                        contentColor = Color.White
+                        containerColor = Color.White.copy(alpha = 0.5f),
+                        contentColor = Color.Black
                     )
                 ) {
                     Text("Retry")
@@ -293,4 +260,68 @@ fun SnakeGameScreen() {
             }
         }
     }
+}
+
+private fun DrawScope.drawGameBoard(gameState: SnakeGameState) {
+    // Draw a more prominent border
+    drawRect(
+        color = Color.White.copy(alpha = 0.5f),  // Semi-transparent white border
+        style = Stroke(width = 4f),  // Thicker border
+        topLeft = Offset.Zero,
+        size = Size(size.width, size.height)
+    )
+
+    // Draw snake segments with multi-color palette
+    gameState.snake.forEachIndexed { index, segment ->
+        val cellWidth = size.width / gameState.gameGridWidth
+        val cellHeight = size.height / gameState.gameGridHeight
+
+        val color = SNAKE_COLORS[index % SNAKE_COLORS.size]
+        val darkerColor = color.copy(
+            red = min(color.red * 1.2f, 1f),
+            green = min(color.green * 1.2f, 1f),
+            blue = min(color.blue * 1.2f, 1f)
+        )
+
+        // Draw snake segment with slight rounding
+        drawRect(
+            color = color,
+            topLeft = Offset(
+                segment.position.x * cellWidth + cellWidth * 0.1f,
+                segment.position.y * cellHeight + cellHeight * 0.1f
+            ),
+            size = Size(
+                cellWidth * 0.8f, 
+                cellHeight * 0.8f
+            )
+        )
+        
+        // Add subtle border for depth
+        drawRect(
+            color = darkerColor.copy(alpha = 0.3f),
+            style = Stroke(width = 2f),
+            topLeft = Offset(
+                segment.position.x * cellWidth + cellWidth * 0.1f,
+                segment.position.y * cellHeight + cellHeight * 0.1f
+            ),
+            size = Size(
+                cellWidth * 0.8f, 
+                cellHeight * 0.8f
+            )
+        )
+    }
+
+    // Draw food with smaller size and more vibrant color
+    val cellWidth = size.width / gameState.gameGridWidth
+    val cellHeight = size.height / gameState.gameGridHeight
+    val foodSize = Size(cellWidth * 0.6f, cellHeight * 0.6f)  // Smaller food size
+    
+    drawRect(
+        color = FoodRed.copy(alpha = 0.8f),  // More vibrant food color
+        topLeft = Offset(
+            gameState.food.position.x * cellWidth + cellWidth * 0.2f,
+            gameState.food.position.y * cellHeight + cellHeight * 0.2f
+        ),
+        size = foodSize
+    )
 }
